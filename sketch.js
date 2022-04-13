@@ -86,7 +86,7 @@ function startGame() {
 	treePos_y = height / 2
 
 	// Initialise arrays of scenery objects.
-	trees_x = [-300, 30, 500, 950, 2000];
+	trees_x = [-300, 35, 500, 150, 2000];
 
 	clouds = []
 	for (var i = 0; i < 20; i++) {
@@ -112,19 +112,19 @@ function startGame() {
 			c_y: floorPos_y
 		},
 		{
-			a_x: 1100,
+			a_x: 1100 + 200,
 			a_y: floorPos_y - 200,
-			b_x: 850,
+			b_x: 850 + 200,
 			b_y: floorPos_y,
-			c_x: 1300,
+			c_x: 1300 + 200,
 			c_y: floorPos_y
 		},
 		{
-			a_x: 1200,
+			a_x: 1200 + 200,
 			a_y: floorPos_y - 150,
-			b_x: 900,
+			b_x: 900 + 200,
 			b_y: floorPos_y,
-			c_x: 1400,
+			c_x: 1400 + 200,
 			c_y: floorPos_y
 		},
 		{
@@ -147,24 +147,27 @@ function startGame() {
 	];
 
 	canyons_x = [
-		{ width: 200, x_pos: -200 },
-		{ width: 300, x_pos: 550 },
+		{ width: 250, x_pos: -200 },
+		{ width: 500, x_pos: 550 },
 		{ width: 350, x_pos: 2500 },
-		{ width: 340, x_pos: 4000 },
+		{ width: 640, x_pos: 4000 },
 
 	];
 
 	collectables = [];
 
-	for (var i = 0; i < 30; i++) {
+	for (var i = 0; i < 35; i++) {
 		collectables.push({ x_pos: random(-1000, 3000), y_pos: random(110, 300), size: 25, isFound: false })
 	}
 
 	platforms = [];
 
-	platforms.push(createPlatforms(100, floorPos_y - 100, 100));
+	platforms.push(createPlatforms(-100, floorPos_y - 100, 100));
 	platforms.push(createPlatforms(700, floorPos_y - 200, 150));
-	platforms.push(createPlatforms(2000, floorPos_y - 150, 120));
+	platforms.push(createPlatforms(2500, floorPos_y - 250, 120));
+	platforms.push(createPlatforms(4000, floorPos_y - 100, 120));
+	platforms.push(createPlatforms(4300, floorPos_y - 80, 190));
+	platforms.push(createPlatforms(4700, floorPos_y - 90, 90));
 
 
 	game_score = 0;
@@ -176,8 +179,11 @@ function startGame() {
 
 	enemies = [];
 	enemies.push(new Enemy(100, floorPos_y - 10, 100));
-	enemies.push(new Enemy(700, floorPos_y - 20, 100));
 	enemies.push(new Enemy(1200, floorPos_y - 15, 100));
+	enemies.push(new Enemy(1700, floorPos_y - 20, 100));
+	enemies.push(new Enemy(2340, floorPos_y - 15, 100));
+	enemies.push(new Enemy(3200, floorPos_y - 15, 100));
+	enemies.push(new Enemy(4700, floorPos_y - 15, 100));
 
 }
 
@@ -196,7 +202,7 @@ function draw() {
 	drawTrees();
 	drawPlatforms();
 
-	
+
 	// Draw canyons.
 	for (var i = 0; i < canyons_x.length; i++) {
 		drawCanyon(canyons_x[i]);
@@ -296,7 +302,7 @@ function draw() {
 			}
 		}
 		if (isContact == false) {
-			gameChar_y += 1;
+			// gameChar_y += 1;
 			isFalling = true;
 		} else {
 			isFalling = false;
@@ -334,6 +340,7 @@ function keyPressed() {
 	}
 	if (keyCode == 39) {
 		// console.log("right arrow");
+
 		isRight = true;
 	}
 	if (keyCode == 32 && !isFalling) {
@@ -636,7 +643,12 @@ function drawCanyon(t_canyon) {
 function checkCanyon(t_canyon) {
 	//make character fall if walks trough canyon 
 	if (gameChar_world_x > t_canyon.x_pos && gameChar_world_x < t_canyon.x_pos + t_canyon.width) {
-		if (isContact == false) {
+		if (Math.abs(gameChar_y -50 - floorPos_y) < 8) { // makes sure player collides with top of platform
+			isFalling = false;
+			console.log("ground")
+		} 
+		if (isContact == false) 
+		{
 
 			isFalling = true;
 		}
@@ -706,7 +718,7 @@ function checkPlayerDie() {
 			startGame();
 		}
 	}
-	console.log(lives)
+	// console.log(lives)
 }
 
 function createPlatforms(x, y, length) {
@@ -721,7 +733,7 @@ function createPlatforms(x, y, length) {
 		checkContact: function (gc_x, gc_y) {
 			if (gc_x > this.x && gc_x < this.x + this.length) {
 				var d = this.y - gc_y;
-				if (d >= 0 && d < 3) {
+				if (d >= 0 && d < 8) {
 					return true;
 				}
 			}
@@ -751,8 +763,9 @@ function Enemy(x, y, range) {
 	}
 	this.draw = function () {
 		this.update();
-		fill(255, 50, 90)
-		ellipse(this.currentX, this.y, 20, 20);
+		fill(160, 50, 90)
+		rect(this.currentX, this.y - 80, 20, 90, 90, 80, 5, 5);
+
 	}
 	this.checkContact = function () {
 		if (gameChar_world_x > this.currentX && gameChar_world_x < this.currentX + 20 && (gameChar_y > floorPos_y - 10)) {
